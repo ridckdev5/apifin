@@ -1,0 +1,25 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "api": "file:",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "git": "^0.1.5",
+    "mongodb": "^6.10.0",
+    "vercel": "^28.18.5"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  }
+}
