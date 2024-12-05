@@ -12,4 +12,5 @@ model User {
   conta   Json?
   transacoes      Json[]
   transacoest      Json?
+  
 }
