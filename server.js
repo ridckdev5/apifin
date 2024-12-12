@@ -8,7 +8,6 @@ const prisma = new PrismaClient()
 const app = express()
 app.use(express.json())
 
-
 const allowedIP = '2804:910:80a:7101:e9fe:6409:81ff:9e61';
 
 app.use(basicAuth({
@@ -21,10 +20,8 @@ app.use(cors({
     origin: 'https://finan-as-final.vercel.app'
 }));
 
-
 app.use((req, res, next) => {
   const clientIP = req.ip;
-
 
   if (clientIP === allowedIP) {
     next();  
@@ -32,7 +29,6 @@ app.use((req, res, next) => {
     res.status(403).send('Acesso negado!');  
   }
 });
-
 
 app.get('/usuarios', async (req, res) => {
     const users = await prisma.user.findMany()
@@ -153,8 +149,9 @@ app.delete('/usuarios/:id', async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log('rodando')
+// Use a variável de ambiente PORT fornecida pela plataforma
+app.listen(process.env.PORT || 3000, () => {
+    console.log('Servidor rodando');
 })
 
 export default app
