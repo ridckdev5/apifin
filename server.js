@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
-import basicAuth from 'express-basic-auth';  // Corrigido para ESM
+import basicAuth from 'express-basic-auth'; // Correção para ESM
 
 const prisma = new PrismaClient();
 
@@ -149,9 +149,10 @@ app.delete('/usuarios/:id', async (req, res) => {
     }
 });
 
-
-app.listen(3000, () => {
-    console.log('Servidor rodando');
+// Configuração do port para Render ou outro serviço
+const port = process.env.PORT || 3000; // Definindo a porta
+app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
 });
 
 export default app;
