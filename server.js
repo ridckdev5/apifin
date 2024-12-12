@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
-const allowedIP = '2804:910:80a:7101:e9fe:6409:81ff:9e61';
+const allowedIP = '187.94.16.2';
 
 app.use(basicAuth({
     users: { 'usuario': 'senha' },
