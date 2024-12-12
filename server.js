@@ -149,10 +149,10 @@ app.delete('/usuarios/:id', async (req, res) => {
     }
 });
 
-// Configuração do port para Render ou outro serviço
-const port = process.env.PORT || 3000; // Definindo a porta
-app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+
+
+app.listen(3000, () => {
+    console.log(`Servidor rodando na porta ${3000}`);
 });
 
 export default app;
