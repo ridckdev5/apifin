@@ -1,12 +1,12 @@
-import express from 'express'
-import cors from 'cors'
-import { PrismaClient } from '@prisma/client'
-const basicAuth = require('express-basic-auth');
+import express from 'express';
+import cors from 'cors';
+import { PrismaClient } from '@prisma/client';
+import basicAuth from 'express-basic-auth';  // Corrigido para ESM
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-const app = express()
-app.use(express.json())
+const app = express();
+app.use(express.json());
 
 const allowedIP = '2804:910:80a:7101:e9fe:6409:81ff:9e61';
 
@@ -31,9 +31,9 @@ app.use((req, res, next) => {
 });
 
 app.get('/usuarios', async (req, res) => {
-    const users = await prisma.user.findMany()
-    res.json(users)
-})
+    const users = await prisma.user.findMany();
+    res.json(users);
+});
 
 app.post('/usuarios', async (req, res) => {
     try {
@@ -43,19 +43,19 @@ app.post('/usuarios', async (req, res) => {
                 logado: req.body.logado,
                 transacoes: req.body.transacoest
             }
-        })
+        });
 
-        res.status(201).json(usuario)
+        res.status(201).json(usuario);
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ error: 'Erro ao criar o usuário' })
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao criar o usuário' });
     }
-})
+});
 
 app.put("/usuarios/:id", async (req, res) => {
     try {
-        const { id } = req.params
-        const { transacoest } = req.body
+        const { id } = req.params;
+        const { transacoest } = req.body;
 
         const updatedUser = await prisma.user.update({
             where: {
@@ -66,13 +66,13 @@ app.put("/usuarios/:id", async (req, res) => {
                     push: transacoest
                 },
             },
-        })
+        });
 
-        res.json(updatedUser)
+        res.json(updatedUser);
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao adicionar transação' })
+        res.status(500).json({ error: 'Erro ao adicionar transação' });
     }
-})
+});
 
 app.put('/usuarios/:userId/:transacaoId', async (req, res) => {
     const { userId, transacaoId } = req.params;
@@ -149,9 +149,9 @@ app.delete('/usuarios/:id', async (req, res) => {
     }
 });
 
-// Use a variável de ambiente PORT fornecida pela plataforma
-app.listen(process.env.PORT || 3000, () => {
-    console.log('Servidor rodando');
-})
 
-export default app
+app.listen(3000, () => {
+    console.log('Servidor rodando');
+});
+
+export default app;
