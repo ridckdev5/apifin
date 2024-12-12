@@ -1,12 +1,38 @@
 import express from 'express'
 import cors from 'cors'
 import { PrismaClient } from '@prisma/client'
+const basicAuth = require('express-basic-auth');
 
 const prisma = new PrismaClient()
 
 const app = express()
 app.use(express.json())
-app.use(cors())
+
+
+const allowedIP = '2804:910:80a:7101:e9fe:6409:81ff:9e61';
+
+app.use(basicAuth({
+    users: { 'usuario': 'senha' },
+    challenge: true,
+    realm: 'Restrito',
+}));
+
+app.use(cors({
+    origin: 'https://finan-as-final.vercel.app'
+}));
+
+
+app.use((req, res, next) => {
+  const clientIP = req.ip;
+
+
+  if (clientIP === allowedIP) {
+    next();  
+  } else {
+    res.status(403).send('Acesso negado!');  
+  }
+});
+
 
 app.get('/usuarios', async (req, res) => {
     const users = await prisma.user.findMany()
@@ -52,88 +78,75 @@ app.put("/usuarios/:id", async (req, res) => {
     }
 })
 
-
 app.put('/usuarios/:userId/:transacaoId', async (req, res) => {
-    const { userId, transacaoId } = req.params;  // Obtém o ID do usuário e o ID da transação a partir da URL
-    const { novaTransacao } = req.body;  // Obtém os novos dados da transação a partir do corpo da requisição
+    const { userId, transacaoId } = req.params;
+    const { novaTransacao } = req.body;
 
     try {
-        // Recupera o usuário com o array de transações
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { transacoes: true },  // Apenas o campo transacoes
+            select: { transacoes: true },
         });
 
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
-        // Verifica se a transação existe no array de transações
         const transacaoExistente = user.transacoes.find(transacao => transacao.transacaoId === transacaoId);
         if (!transacaoExistente) {
             return res.status(404).json({ error: 'Transação não encontrada' });
         }
 
-        // Atualiza a transação encontrada com os novos dados
         const updatedTransacoes = user.transacoes.map(transacao => {
             if (transacao.transacaoId === transacaoId) {
-                // Atualize os campos da transação aqui conforme os dados recebidos
-                return { ...transacao, ...novaTransacao };  // Exemplo: substitui os dados antigos pelos novos
+                return { ...transacao, ...novaTransacao };
             }
             return transacao;
         });
 
-        // Atualiza o usuário com o novo array de transações
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: {
-                transacoes: updatedTransacoes,  // Atualiza o array de transações com a transação editada
+                transacoes: updatedTransacoes,
             },
         });
 
-        res.json(updatedUser);  // Retorna o usuário atualizado com a transação editada
+        res.json(updatedUser);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao editar a transação' });
     }
 });
 
-
-
-
 app.delete('/usuarios/:id', async (req, res) => {
-    const userId = req.params.id;  // Obtém o ID do usuário a partir da URL
-    const { transacaoid } = req.body;  // Obtém o ID da transação a ser excluída
+    const userId = req.params.id;
+    const { transacaoid } = req.body;
 
     try {
-        // Recupera o usuário com o array de transações
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { transacoes: true },  // Apenas o campo transacoes
+            select: { transacoes: true },
         });
 
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
-        // Verifica se a transação existe antes de tentar removê-la
         const transacaoExistente = user.transacoes.find(transacao => transacao.transacaoId === transacaoid);
         if (!transacaoExistente) {
             return res.status(404).json({ error: 'Transação não encontrada' });
         }
 
-        // Filtra o array de transações, removendo a transação que corresponde ao transacaoId
         const updatedTransacoes = user.transacoes.filter(transacao => transacao.transacaoId !== transacaoid);
 
-        // Atualiza o usuário com o array de transações filtrado
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: {
-                transacoes: updatedTransacoes,  // Atualiza o array de transações removendo o objeto
+                transacoes: updatedTransacoes,
             },
         });
 
-        res.status(204).send();  // Retorna sucesso sem conteúdo
+        res.status(204).send();
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao deletar a transação' });
